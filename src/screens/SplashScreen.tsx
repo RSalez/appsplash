@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-
-// Supondo que você esteja usando React Navigation para navegar entre telas
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 export default function SplashScreen() {
@@ -9,17 +7,20 @@ export default function SplashScreen() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.navigate('Inicio');  // Nome da sua HomeScreen no navigator
-    }, 3000); // 3000ms = 3 segundos
+      navigation.navigate('Home' as never); // Navega para a Home
+    }, 5000); // 2 segundos
 
-    // Cleanup para evitar memory leaks
     return () => clearTimeout(timer);
   }, []);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Splash Screen</Text>
-      {/* Aqui você pode colocar seu logo ou animação */}
+      <Image
+        source={require('../../assets/splash.png')}
+        style={styles.logo}
+        resizeMode="contain"
+      />
+      <Text style={styles.text}>Carregando GeoApp...</Text>
     </View>
   );
 }
@@ -27,12 +28,18 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#4F6D7A',
-    justifyContent: 'center',
+    backgroundColor: '#0070daff',
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logo: {
+    width: 400,
+    height: 300,
   },
   text: {
-    fontSize: 28,
-    color: 'white',
+    marginTop: 25,
+    fontSize: 35,
+    fontWeight: 'bold',
+    color: '#333',
   },
 });

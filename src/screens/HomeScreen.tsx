@@ -1,44 +1,73 @@
-import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-
-const DATA = [
-  { id: '1', title: 'Item 1' },
-  { id: '2', title: 'Item 2' },
-  { id: '3', title: 'Item 3' },
-];
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import api from '../services/api';
+import { GeoData } from '../types/GeoData';
 
 export default function HomeScreen() {
-  const renderItem = ({ item }: { item: { id: string; title: string } }) => (
-    <View style={styles.item}>
-      <Text>{item.title}</Text>
-    </View>
-  );
+  const [geo, setGeo] = useState<GeoData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchGeoData = async () => {
+      try {
+        const response = await api.get<GeoData>('/161.185.160.93/geo');
+        setGeo(response.data);
+      } catch (error) {
+        console.error('Erro ao buscar dados geográficos:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGeoData();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
+  }
+
+  if (!geo) {
+    return (
+      <View style={styles.centered}>
+        <Text>Erro ao carregar dados.</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Lista de Itens</Text>
-      <FlatList
-        data={DATA}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-      />
+      <Text style={styles.label}>IP: <Text style={styles.value}>{geo.ip}</Text></Text>
+      <Text style={styles.label}>Cidade: <Text style={styles.value}>{geo.city}</Text></Text>
+      <Text style={styles.label}>Região: <Text style={styles.value}>{geo.region}</Text></Text>
+      <Text style={styles.label}>País: <Text style={styles.value}>{geo.country}</Text></Text>
+      <Text style={styles.label}>Localização: <Text style={styles.value}>{geo.loc}</Text></Text>
+      <Text style={styles.label}>Organização: <Text style={styles.value}>{geo.org}</Text></Text>
+      <Text style={styles.label}>CEP: <Text style={styles.value}>{geo.postal}</Text></Text>
+      <Text style={styles.label}>Fuso horário: <Text style={styles.value}>{geo.timezone}</Text></Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    padding: 35,
+    marginTop: 15,
+  },
+  centered: {
     flex: 1,
-    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  title: {
-    fontSize: 24,
-    marginBottom: 15,
+  label: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginTop: 10,
   },
-  item: {
-    padding: 15,
-    marginVertical: 8,
-    backgroundColor: '#eee',
-    borderRadius: 8,
+  value: {
+    fontWeight: 'normal',
   },
 });
